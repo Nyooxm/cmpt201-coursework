@@ -5,6 +5,7 @@
 // repeats the above two steps forever, use fork, exec & waitpid
 #define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -22,12 +23,17 @@ int main() {
     }
     path[inputpath - 1] = '\0';
     pid_t pid = fork();
+    if (pid == -1) {
+      printf("pid cannot be negative, fork failed.\n");
+      continue;
+    }
     if (pid == 0) {
-      execlp(path, path, NULL);
+      execlp(path, path, (char *)NULL);
       printf("execlp failed!\n");
       return 1;
     } else {
       waitpid(pid, NULL, 0);
     }
   }
+  free(path);
 }
